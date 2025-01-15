@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_message_failed_to_fetch_products">Failed to fetch products</string>
+    <string name="error_message_failed_to_fetch_products_reviews">Failed to fetch reviews of products</string>
+</resources>
