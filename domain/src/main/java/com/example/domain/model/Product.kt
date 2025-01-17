@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Product(
-    @SerializedName("product_id") val id: Long,
+    @SerializedName("product_id") val id: Int,
     @SerializedName("product_name") val name: String,
     @SerializedName("description") val description: String,
     @SerializedName("price") val price: Double,
