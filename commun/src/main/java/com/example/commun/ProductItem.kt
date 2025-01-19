@@ -48,7 +48,7 @@ fun ProductItem(
     onExpandClick: (id: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val imageUrl = product.imagesUrl.selectQualityUrlImage()
+    val imageUrl = product.imagesUrl?.selectQualityUrlImage()
     val localDensity = LocalDensity.current
 
     // Create element height in dp state

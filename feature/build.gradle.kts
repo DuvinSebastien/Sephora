@@ -57,4 +57,7 @@ dependencies {
     implementation(libs.hilt.navigation)
     kapt(libs.hilt.compiler)
     implementation(libs.airbnb.lottie)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutine.test)
+    testImplementation(libs.turbine)
 }

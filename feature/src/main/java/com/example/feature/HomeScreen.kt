@@ -34,7 +34,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,20 +58,14 @@ import com.example.commun.utils.animatedColor
 import com.example.commun.utils.isInternetConnected
 import com.example.commun.utils.snapshotStateMapSaver
 import com.example.domain.model.Product
-import com.example.domain.utils.Resource.IDLE.onEmptyCompose
-import com.example.domain.utils.Resource.Loading.onErrorCompose
-import com.example.domain.utils.Resource.Loading.onLoadingCompose
-import com.example.domain.utils.Resource.Loading.onValueCompose
+import com.example.domain.model.Review
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel()) {
 
-    val productList by viewModel.productList.collectAsStateWithLifecycle()
-    val searchText by viewModel.searchText.collectAsStateWithLifecycle()
-    val sortAscending by viewModel.sortAscending.collectAsStateWithLifecycle()
-    val sortList = viewModel.sortList
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val isDropDownExpanded = remember {
         mutableStateOf(false)
@@ -86,7 +79,7 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel()) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SearchBar(searchText = searchText, modifier.weight(1f), onValueChange = {
+            SearchBar(searchText = viewState.searchText, modifier.weight(1f), onValueChange = {
                 viewModel.onSearchTextChange(it)
             })
 
@@ -100,11 +93,11 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel()) {
                 DropdownMenu(expanded = isDropDownExpanded.value, onDismissRequest = {
                     isDropDownExpanded.value = false
                 }) {
-                    sortList.forEachIndexed { index, sort ->
+                    viewState.sortList.forEachIndexed { index, sort ->
                         DropdownMenuItem(text = {
                             Text(text = sort.text)
                         }, leadingIcon = {
-                            if (sortAscending == sort) {
+                            if (viewState.sortAscending == sort) {
                                 Icon(Icons.Default.Check, contentDescription = "")
                             }
                         }, onClick = {
@@ -117,144 +110,148 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel()) {
         }
 
     }) { padding ->
-
-        productList.onValueCompose { listProduct ->
-            // Refresh view
-            val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
-            val state = rememberPullToRefreshState()
-
-            PullToRefreshBox(modifier = Modifier.padding(padding),
-                state = state,
-                isRefreshing = isRefreshing,
-                onRefresh = {
-                    viewModel.refresh()
-                },
-                indicator = {
-                    PullToRefreshDefaults.Indicator(
-                        state = state,
-                        isRefreshing = isRefreshing,
-                        modifier = Modifier.align(Alignment.TopCenter),
-                    )
-                }) {
-                ProductList(
-                    listProduct,
-                    viewModel = viewModel,
-                )
-            }
-        }
-        productList.onEmptyCompose {
-            val preloaderLottieComposition by rememberLottieComposition(
-                LottieCompositionSpec.RawRes(
-                    com.example.commun.R.raw.empty_result
-                )
-            )
-
-            val preloaderProgress by animateLottieCompositionAsState(
-                preloaderLottieComposition,
-                iterations = LottieConstants.IterateForever,
-                isPlaying = true
-            )
-
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LottieAnimation(
-                    composition = preloaderLottieComposition,
-                    progress = preloaderProgress,
-                    modifier = Modifier.size(300.dp)
-                )
-            }
-        }
-        productList.onLoadingCompose {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(8.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                items(7) {
-                    Card(
-                        modifier = Modifier
-                            .height(height = 375.dp)
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = animatedColor(),
-                        )
-                    ) {}
-                }
-            }
-        }
-        productList.onErrorCompose {
-            val context = LocalContext.current
-            val preloaderLottieComposition by rememberLottieComposition(
-                LottieCompositionSpec.RawRes(
-                    com.example.commun.R.raw.error_server
-                )
-            )
-
-            val preloaderProgress by animateLottieCompositionAsState(
-                preloaderLottieComposition,
-                iterations = LottieConstants.IterateForever,
-                isPlaying = true
-            )
-
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LottieAnimation(
-                    composition = preloaderLottieComposition,
-                    progress = preloaderProgress,
-                    modifier = Modifier.size(300.dp)
-                )
-                Text(
-                    text = it.message ?: stringResource(R.string.unknow_error),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
-                if (isInternetConnected(context)) {
-                    Spacer(Modifier.weight(1f))
-                    Button(
-                        onClick = {
-                            viewModel.refresh()
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.retry).uppercase(),
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center,
+        when {
+            viewState.isLoading -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(8.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    items(7) {
+                        Card(
                             modifier = Modifier
-                        )
+                                .height(height = 375.dp)
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = animatedColor(),
+                            )
+                        ) {}
                     }
-                    Spacer(Modifier.height(16.dp))
+                }
+            }
 
+            viewState.isError -> {
+                val context = LocalContext.current
+                val preloaderLottieComposition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(
+                        com.example.commun.R.raw.error_server
+                    )
+                )
+
+                val preloaderProgress by animateLottieCompositionAsState(
+                    preloaderLottieComposition,
+                    iterations = LottieConstants.IterateForever,
+                    isPlaying = true
+                )
+
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LottieAnimation(
+                        composition = preloaderLottieComposition,
+                        progress = preloaderProgress,
+                        modifier = Modifier.size(300.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.unknow_error),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    if (isInternetConnected(context)) {
+                        Spacer(Modifier.weight(1f))
+                        Button(
+                            onClick = {
+                                viewModel.refresh()
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.retry).uppercase(),
+                                style = MaterialTheme.typography.titleMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                            )
+                        }
+                        Spacer(Modifier.height(16.dp))
+
+                    }
+                }
+            }
+
+            viewState.products.isEmpty() -> {
+                val preloaderLottieComposition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(
+                        com.example.commun.R.raw.empty_result
+                    )
+                )
+
+                val preloaderProgress by animateLottieCompositionAsState(
+                    preloaderLottieComposition,
+                    iterations = LottieConstants.IterateForever,
+                    isPlaying = true
+                )
+
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LottieAnimation(
+                        composition = preloaderLottieComposition,
+                        progress = preloaderProgress,
+                        modifier = Modifier.size(300.dp)
+                    )
+                }
+            }
+
+            else -> {
+                // Refresh view
+                val state = rememberPullToRefreshState()
+
+                PullToRefreshBox(modifier = Modifier.padding(padding),
+                    state = state,
+                    isRefreshing = viewState.isRefreshing,
+                    onRefresh = {
+                        viewModel.refresh()
+                    },
+                    indicator = {
+                        PullToRefreshDefaults.Indicator(
+                            state = state,
+                            isRefreshing = viewState.isRefreshing,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                        )
+                    }) {
+                    ProductList(
+                        viewState.products,
+                        viewState.reviews
+                    )
                 }
             }
         }
-
     }
 }
 
 @Composable
-fun ProductList(products: List<Product>, viewModel: HomeViewModel, modifier: Modifier = Modifier) {
+fun ProductList(
+    products: List<Product>,
+    reviews: Map<Int, List<Review>>,
+    modifier: Modifier = Modifier
+) {
 
-    val reviewsListById by viewModel.reviewsListById.collectAsStateWithLifecycle()
-    val sortedReviews by viewModel.sortAscending.collectAsStateWithLifecycle()
     val isExpandedMap = rememberSaveable(saver = snapshotStateMapSaver()) {
         List(products.size) { index: Int -> index to false }.toMutableStateMap()
     }
@@ -265,19 +262,12 @@ fun ProductList(products: List<Product>, viewModel: HomeViewModel, modifier: Mod
         modifier = modifier.fillMaxSize()
     ) {
         itemsIndexed(products) { index, product ->
-            val reviews = reviewsListById[product.id] ?: emptyList()
-            LaunchedEffect(sortedReviews) {
-                viewModel.getReviewsListByProductId(product.id)
-            }
 
             ProductItem(product = product,
-                reviews = reviews,
+                reviews = reviews[product.id] ?: emptyList(),
                 isExpanded = isExpandedMap[index] ?: true,
                 onExpandClick = {
                     isExpandedMap[index] = !(isExpandedMap[index] ?: true)
-                    if (isExpandedMap[index] == true) {
-                        viewModel.getReviewsListByProductId(product.id)
-                    }
                 })
         }
     }
