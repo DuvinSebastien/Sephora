@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import com.example.domain.model.ImagesUrl
@@ -29,11 +28,12 @@ fun ImagesUrl.selectQualityUrlImage(): String? {
 fun Double.formatPriceToString(): String {
     val numberFormat = NumberFormat.getNumberInstance(Locale.FRANCE)
     numberFormat.minimumFractionDigits = if (this % 1 == 0.0) 0 else 2
-    return "${numberFormat.format(this)}€"}
+    return "${numberFormat.format(this)}€"
+}
 
 @Composable
 fun animatedColor(): Color {
-    val infiniteTransition = rememberInfiniteTransition()
+    val infiniteTransition = rememberInfiniteTransition(label = "")
     val color by infiniteTransition.animateColor(
         initialValue = MaterialTheme.colorScheme.background,
         targetValue = Color.LightGray,

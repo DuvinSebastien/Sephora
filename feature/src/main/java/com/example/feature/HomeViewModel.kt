@@ -103,7 +103,7 @@ class HomeViewModel @Inject constructor(
         _searchText.value = text
     }
 
-    fun orderReview(value: SortList) {
+    fun orderReviews(value: SortList) {
         _sortAscending.value = value
     }
 

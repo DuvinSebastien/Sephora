@@ -55,7 +55,6 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.commun.ProductItem
 import com.example.commun.SearchBar
-import com.example.commun.utils.SortList
 import com.example.commun.utils.animatedColor
 import com.example.commun.utils.isInternetConnected
 import com.example.commun.utils.snapshotStateMapSaver
@@ -74,6 +73,7 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel()) {
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val sortAscending by viewModel.sortAscending.collectAsStateWithLifecycle()
     val sortList = viewModel.sortList
+
     val isDropDownExpanded = remember {
         mutableStateOf(false)
     }
@@ -109,7 +109,7 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel()) {
                             }
                         }, onClick = {
                             isDropDownExpanded.value = false
-                            viewModel.orderReview(sort)
+                            viewModel.orderReviews(sort)
                         })
                     }
                 }
@@ -122,6 +122,7 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel()) {
             // Refresh view
             val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
             val state = rememberPullToRefreshState()
+
             PullToRefreshBox(modifier = Modifier.padding(padding),
                 state = state,
                 isRefreshing = isRefreshing,

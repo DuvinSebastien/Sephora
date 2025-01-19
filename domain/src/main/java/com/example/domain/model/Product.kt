@@ -15,13 +15,3 @@ data class Product(
     @SerializedName("is_productSet") val isProductSet: Boolean,
     @SerializedName("is_special_brand") val isSpecialBrand: Boolean,
 ) : Parcelable
-
-@Parcelize
-data class Brand(@SerializedName("id") val id: String, @SerializedName("name") val name: String) :
-    Parcelable
-
-@Parcelize
-data class ImagesUrl(
-    @SerializedName("small") val small: String,
-    @SerializedName("large") val large: String
-) : Parcelable

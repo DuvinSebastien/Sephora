@@ -44,8 +44,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(project(":domain"))
+    testImplementation(project(":domain"))
     implementation(libs.coil.network)
     implementation(libs.coil)
     implementation(libs.glide)
-
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutine.test)
 }

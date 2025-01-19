@@ -10,10 +10,3 @@ data class ProductReview(
     @SerializedName("hide") val hide: Boolean? = null,
     @SerializedName("reviews") val reviews: List<Review>
 ) : Parcelable
-
-@Parcelize
-data class Review(
-    @SerializedName("name") val name: String? = null,
-    @SerializedName("text") val text: String? = null,
-    @SerializedName("rating") val rating: Float? = null
-) : Parcelable
