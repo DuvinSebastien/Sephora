@@ -53,14 +53,16 @@ Ils perdurent tout au long du cycle de vie de l'écran et permet une sauvegarde 
 
 ## Axe d'amélioration
 
--Ajout d'une navigation (NavGraph) pour pouvoir faciliter la navigation dans différents écran (écran
-details / profile...).
--Gestion du multilangue par pays, avec différents fichier strings, ou des différentes unités (
-tailles /
-monnais...).
--Ajout de class abstact pour centralisé les différentes api error, et ajuster les messages ou types
-d'affichage
--Ajout d'un spashScreen, coté UI afficher un loader au lancement de l'app, coté domain pouvoir
-attendre d'avoir toutes les infos pour ensuite ouvrir la Home(compte abonnée / profile complété /
-données principales...)  
++ Ajout d'une navigation (NavGraph) pour pouvoir faciliter la navigation dans différents écran (
+  écran
+  details / profile...).
++ Gestion du multilangue par pays, avec différents fichier strings, ou des différentes unités (
+  tailles / monnais...).
+
++ Ajout de class abstact pour centralisé les différentes api error, et ajuster les messages ou types
+  d'affichage
+
++ Ajout d'un spashScreen, coté UI afficher un loader au lancement de l'app, coté domain pouvoir
+  attendre d'avoir toutes les infos pour ensuite ouvrir la Home(compte abonnée / profile complété /
+  données principales...)  
 
