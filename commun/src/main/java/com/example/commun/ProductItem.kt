@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.Placeholder
 import com.bumptech.glide.integration.compose.placeholder
 import com.example.commun.utils.formatPriceToString
 import com.example.commun.utils.selectQualityUrlImage
@@ -76,6 +77,7 @@ fun ProductItem(
                 model = imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                failure = placeholder(R.drawable.empty_product),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(175.dp)
